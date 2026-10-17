@@ -1,0 +1,44 @@
+package-lock.json
+  s_5ddfc8f4108175::t_c99c731bce0542 1-3227
+test/judge.test.ts
+  s_5ddfc8f4108175::t_e4b4164eabc852 1-52
+src/index.ts
+  s_5ddfc8f4108175::t_7b716aea1f296a 1-50
+receipts/terrarium-load.json
+  s_5ddfc8f4108175::t_763f2e62c9e9dd 1-57
+README.md
+  s_5ddfc8f4108175::t_887ca459a0737d 1-29
+package.json
+  s_5ddfc8f4108175::t_bb2b44cdf4b2bb 1-24
+LOOP.md
+  s_5ddfc8f4108175::t_e18cbb4ebd68ed 1-5
+tsconfig.json
+  s_5ddfc8f4108175::t_ef790deefd3bcd 1-7
+gate.sh
+  s_5ddfc8f4108175::t_aceccd4fa9741d 1-23
+src/judge.ts
+  s_5ddfc8f4108175::t_bec791b9f2c4d4 1-61
+.gitignore
+  s_5ddfc8f4108175::t_aca110933cf50f 1-2
+  s_5ddfc8f4108175::t_46da4206f97a42 3
+src/clef.ts
+  s_5ddfc8f4108175::t_a08ff7de121139 1-24
+receipts/eval.json
+  s_5ddfc8f4108175::t_f4ed95b2defd37 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "5da5ee0e51964e6a0982eb95e0511d08803721e9",
+  "prompts": {},
+  "sessions": {
+    "s_5ddfc8f4108175": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0fc06-d951-77a8-8358-cd5dae6891bd",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jordan Coeyman <jcoeyman@cloudflare.com>"
+    }
+  }
+}
