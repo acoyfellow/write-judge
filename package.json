@@ -1,0 +1,24 @@
+{
+  "name": "write-judge",
+  "private": true,
+  "type": "module",
+  "description": "Pi extension: a small model judges every edit and write before it lands.",
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0",
+    "@types/node": "^22.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
