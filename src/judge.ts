@@ -46,20 +46,18 @@ export const verdictOf = (weakens: number): Verdict =>
       }
     : { kind: "allow", weakens };
 
-type Input = Record<string, unknown>;
+export type EditInput = { readonly path: string; readonly edits: ReadonlyArray<{ readonly oldText: string; readonly newText: string }> };
 
-const text = (value: unknown) => (typeof value === "string" ? value : "");
+export type WriteInput = { readonly path: string; readonly content: string };
 
-export const callOf = (toolName: string, input: Input, said: string): WriteCall | null => {
-  const path = text(input["path"]);
+export type ToolInput = { readonly toolName: "edit"; readonly input: EditInput } | { readonly toolName: "write"; readonly input: WriteInput } | { readonly toolName: "other" };
 
-  if (!path) return null;
+export const callOf = (tool: ToolInput, said: string): WriteCall | null => {
+  if (tool.toolName === "other" || !tool.input.path) return null;
 
-  if (toolName === "write") return { tool: "write", path, said, pairs: [["", text(input["content"])]] };
+  if (tool.toolName === "write") return { tool: "write", path: tool.input.path, said, pairs: [["", tool.input.content]] };
 
-  if (toolName !== "edit") return null;
-  const edits = Array.isArray(input["edits"]) ? (input["edits"] as ReadonlyArray<Input>) : [];
-  const pairs = edits.map((edit): Pair => [text(edit["oldText"]), text(edit["newText"])]);
+  const pairs = tool.input.edits.map((edit): Pair => [edit.oldText, edit.newText]);
 
-  return pairs.length ? { tool: "edit", path, said, pairs } : null;
+  return pairs.length ? { tool: "edit", path: tool.input.path, said, pairs } : null;
 };

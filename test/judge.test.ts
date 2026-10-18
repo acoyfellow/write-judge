@@ -5,10 +5,10 @@ import { WEAKENS_AT, callOf, stateOf, verdictOf } from "../src/judge.ts";
 
 describe("callOf", () => {
   it("reads edit pairs and write content, and ignores other tools", () => {
-    expect(callOf("edit", { path: "a.ts", edits: [{ oldText: "x", newText: "y" }] }, "s")).toEqual({ tool: "edit", path: "a.ts", said: "s", pairs: [["x", "y"]] });
-    expect(callOf("write", { path: "b.ts", content: "z" }, "")).toEqual({ tool: "write", path: "b.ts", said: "", pairs: [["", "z"]] });
-    expect(callOf("bash", { command: "ls" }, "")).toBeNull();
-    expect(callOf("edit", { path: "a.ts", edits: [] }, "")).toBeNull();
+    expect(callOf({ toolName: "edit", input: { path: "a.ts", edits: [{ oldText: "x", newText: "y" }] } }, "s")).toEqual({ tool: "edit", path: "a.ts", said: "s", pairs: [["x", "y"]] });
+    expect(callOf({ toolName: "write", input: { path: "b.ts", content: "z" } }, "")).toEqual({ tool: "write", path: "b.ts", said: "", pairs: [["", "z"]] });
+    expect(callOf({ toolName: "other" }, "")).toBeNull();
+    expect(callOf({ toolName: "edit", input: { path: "a.ts", edits: [] } }, "")).toBeNull();
   });
 });
 

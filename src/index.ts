@@ -1,8 +1,8 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { type ExtensionAPI, type SessionEntry, type ToolCallEvent, isToolCallEventType } from "@earendil-works/pi-coding-agent";
 import { type ClefConfig, askClef } from "./clef.ts";
-import { QUESTIONS, callOf, stateOf, verdictOf } from "./judge.ts";
+import { QUESTIONS, type ToolInput, callOf, stateOf, verdictOf } from "./judge.ts";
 
 type Env = Readonly<Record<string, string | undefined>>;
 
@@ -14,25 +14,32 @@ export const configOf = (env: Env): ClefConfig | null => {
   return accountId && token && model ? { accountId, token, model } : null;
 };
 
-const logLine = (path: string | undefined, entry: Record<string, unknown>) => {
+type LogEntry = Readonly<Record<string, string | number | boolean | null>>;
+
+const logLine = (path: string | undefined, entry: LogEntry) => {
   if (!path) return;
   mkdirSync(dirname(path), { recursive: true });
   appendFileSync(path, `${JSON.stringify({ at: new Date().toISOString(), ...entry })}\n`);
 };
 
-const lastAssistantText = (messages: ReadonlyArray<unknown>): string => {
-  for (let index = messages.length - 1; index >= 0; index--) {
-    const message = messages[index] as { role?: string; content?: unknown };
+const lastAssistantText = (entries: ReadonlyArray<SessionEntry>): string => {
+  for (let index = entries.length - 1; index >= 0; index--) {
+    const entry = entries[index];
 
-    if (message?.role !== "assistant" || !Array.isArray(message.content)) continue;
+    if (entry?.type !== "message" || entry.message.role !== "assistant") continue;
 
-    return message.content
-      .filter((part): part is { type: string; text: string } => typeof part === "object" && part !== null && (part as { type?: string }).type === "text")
-      .map((part) => part.text)
-      .join(" ");
+    return entry.message.content.flatMap((part) => (part.type === "text" ? [part.text] : [])).join(" ");
   }
 
   return "";
+};
+
+const toolInputOf = (event: ToolCallEvent): ToolInput => {
+  if (isToolCallEventType("edit", event)) return { toolName: "edit", input: event.input };
+
+  if (isToolCallEventType("write", event)) return { toolName: "write", input: event.input };
+
+  return { toolName: "other" };
 };
 
 export default function writeJudge(pi: ExtensionAPI) {
@@ -43,8 +50,8 @@ export default function writeJudge(pi: ExtensionAPI) {
   if (!config) return;
 
   pi.on("tool_call", async (event, ctx) => {
-    const said = lastAssistantText(ctx.sessionManager.getBranch().flatMap((entry) => ("message" in entry ? [entry.message] : [])));
-    const call = callOf(event.toolName, event.input as Record<string, unknown>, said);
+    const said = lastAssistantText(ctx.sessionManager.getBranch());
+    const call = callOf(toolInputOf(event), said);
 
     if (!call) return undefined;
     const started = Date.now();
