@@ -52,10 +52,14 @@ const text = (value: unknown) => (typeof value === "string" ? value : "");
 
 export const callOf = (toolName: string, input: Input, said: string): WriteCall | null => {
   const path = text(input["path"]);
+
   if (!path) return null;
+
   if (toolName === "write") return { tool: "write", path, said, pairs: [["", text(input["content"])]] };
+
   if (toolName !== "edit") return null;
   const edits = Array.isArray(input["edits"]) ? (input["edits"] as ReadonlyArray<Input>) : [];
   const pairs = edits.map((edit): Pair => [text(edit["oldText"]), text(edit["newText"])]);
+
   return pairs.length ? { tool: "edit", path, said, pairs } : null;
 };

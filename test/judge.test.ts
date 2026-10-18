@@ -43,9 +43,11 @@ describe("configOf", () => {
 describe("askClef", () => {
   it("retries a failed reply and returns yes-probabilities", async () => {
     let calls = 0;
+
     const fetcher = async () => ({
       json: async () => (++calls < 2 ? { success: false, errors: [{ code: 3040 }] } : { success: true, result: { answers: { weakens: { noul: 0.8 } } } }),
     });
+
     expect(await askClef(fetcher, { accountId: "a", token: "t", model: "m" }, "s", {})).toEqual({ weakens: 0.8 });
     expect(calls).toBe(2);
   });
