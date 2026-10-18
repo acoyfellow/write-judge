@@ -14,9 +14,11 @@
   },
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "*",
+    "@oxlint/plugins": "1.88.0",
+    "@types/node": "^22.0.0",
+    "oxlint": "1.88.0",
     "typescript": "^5.9.0",
-    "vitest": "^3.2.0",
-    "@types/node": "^22.0.0"
+    "vitest": "^3.2.0"
   },
   "allowScripts": {
     "esbuild@0.28.2": true
