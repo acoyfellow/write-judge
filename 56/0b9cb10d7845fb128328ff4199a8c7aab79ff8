@@ -1,0 +1,25 @@
+LICENSE
+  s_5ddfc8f4108175::t_179e99cacc103d 1-21
+README.md
+  s_5ddfc8f4108175::t_6766095a015b89 23,27-28
+receipts/terrarium-load.json
+  s_5ddfc8f4108175::t_39726fdd2dc14a 13
+tools/oxlint/anti-slop/LICENSE
+  s_5ddfc8f4108175::t_9739c3709bb5e0 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "560b9cb10d7845fb128328ff4199a8c7aab79ff8",
+  "prompts": {},
+  "sessions": {
+    "s_5ddfc8f4108175": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0fc06-d951-77a8-8358-cd5dae6891bd",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jordan Coeyman <jcoeyman@cloudflare.com>"
+    }
+  }
+}
