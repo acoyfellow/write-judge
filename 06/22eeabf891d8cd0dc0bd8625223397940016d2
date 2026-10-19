@@ -1,0 +1,23 @@
+src/clef.ts
+  s_5ddfc8f4108175::t_ddfce6b3c06b79 4,14,36
+src/index.ts
+  s_5ddfc8f4108175::t_c29a9e21ed78aa 9-28,65,71-72,80-95
+test/judge.test.ts
+  s_5ddfc8f4108175::t_53d0068f57f3e5 3,48,56-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "0622eeabf891d8cd0dc0bd8625223397940016d2",
+  "prompts": {},
+  "sessions": {
+    "s_5ddfc8f4108175": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0fc06-d951-77a8-8358-cd5dae6891bd",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jordan Coeyman <jcoeyman@cloudflare.com>"
+    }
+  }
+}
