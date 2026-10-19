@@ -1,8 +1,12 @@
 {
   "name": "write-judge",
-  "private": true,
-  "type": "module",
-  "description": "Pi extension: a small model judges every edit and write before it lands.",
+    "type": "module",
+  "description": "Pi extension: a small yes/no model blocks edits that weaken tests, before they land.",
+  "version": "0.2.0",
+  "license": "MIT",
+  "keywords": ["pi-package", "pi-extension", "ai-agents", "testing", "cloudflare", "workers-ai"],
+  "repository": "github:acoyfellow/write-judge",
+  "files": ["src", "defaults.json", "README.md", "LICENSE"],
   "pi": {
     "extensions": [
       "./src/index.ts"

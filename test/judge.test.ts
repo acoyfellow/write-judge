@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { askClef } from "../src/clef.ts";
-import { configOf, judgeWithRefresh } from "../src/index.ts";
+import { configOf, judgeWithRefresh, resolveConfig } from "../src/index.ts";
+import { firstAccountId, lastLine } from "../src/wrangler.ts";
 import { WEAKENS_AT, callOf, stateOf, verdictOf } from "../src/judge.ts";
 
 describe("callOf", () => {
@@ -56,7 +57,7 @@ describe("askClef", () => {
 
 describe("judgeWithRefresh", () => {
   it("uses the current token when it works", async () => {
-    const result = await judgeWithRefresh(async () => 0.9, "old", () => "new");
+    const result = await judgeWithRefresh(async () => 0.9, "old", async () => "new");
     expect(result).toEqual({ judgement: { kind: "judged", weakens: 0.9 }, token: "old" });
   });
 
@@ -68,14 +69,14 @@ describe("judgeWithRefresh", () => {
       return 0.2;
     };
 
-    const result = await judgeWithRefresh(failsOnOld, "old", () => "new");
+    const result = await judgeWithRefresh(failsOnOld, "old", async () => "new");
     expect(result).toEqual({ judgement: { kind: "judged", weakens: 0.2 }, token: "new" });
   });
 
   it("reports unavailable instead of throwing when refresh does not help", async () => {
-    const same = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", () => "old");
-    const none = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", () => undefined);
-    const stillBad = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", () => "new");
+    const same = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", async () => "old");
+    const none = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", async () => undefined);
+    const stillBad = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", async () => "new");
     expect([same.judgement.kind, none.judgement.kind, stillBad.judgement.kind]).toEqual(["unavailable", "unavailable", "unavailable"]);
   });
 });
@@ -92,5 +93,21 @@ describe("askClef on auth errors", () => {
 
     await expect(askClef(fetcher, { accountId: "a", token: "t", model: "m" }, "s", { q: { type: "noul", instructions: "q" } })).rejects.toThrow("401");
     expect(calls).toBe(1);
+  });
+});
+
+describe("zero-config resolution", () => {
+  it("prefers env, then wrangler, then the default model", async () => {
+    const fromWrangler = await resolveConfig({}, async () => "tok", async () => "acct", () => "model-default");
+    const fromEnv = await resolveConfig({ WRITE_JUDGE_TOKEN: "envtok", WRITE_JUDGE_ACCOUNT_ID: "envacct", WRITE_JUDGE_MODEL: "envmodel" }, async () => "tok", async () => "acct", () => "model-default");
+    const loggedOut = await resolveConfig({}, async () => undefined, async () => undefined, () => "model-default");
+    expect([fromWrangler, fromEnv, loggedOut]).toEqual([{ accountId: "acct", token: "tok", model: "model-default" }, { accountId: "envacct", token: "envtok", model: "envmodel" }, null]);
+  });
+
+  it("parses wrangler output", () => {
+    expect(lastLine("warning line\n  abc123  \n")).toBe("abc123");
+    expect(lastLine("")).toBeUndefined();
+    expect(firstAccountId('noise {"accounts":[{"id":"a1","name":"x"},{"id":"a2","name":"y"}]}')).toBe("a1");
+    expect(firstAccountId("not json")).toBeUndefined();
   });
 });
