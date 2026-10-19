@@ -7,15 +7,17 @@ const run = promisify(execFile);
 
 const Whoami = Type.Object({ accounts: Type.Optional(Type.Array(Type.Object({ id: Type.String() }))) });
 
-const wrangler = async (args: ReadonlyArray<string>): Promise<string | undefined> => {
+const attempt = async (command: string, args: ReadonlyArray<string>): Promise<string | undefined> => {
   try {
-    const { stdout } = await run("npx", ["--yes", "wrangler@latest", ...args], { timeout: 60_000, encoding: "utf8" });
+    const { stdout } = await run(command, [...args], { timeout: 60_000, encoding: "utf8" });
 
     return stdout;
   } catch {
     return undefined;
   }
 };
+
+const wrangler = async (args: ReadonlyArray<string>): Promise<string | undefined> => (await attempt("wrangler", args)) ?? (await attempt("npx", ["--yes", "wrangler@latest", ...args]));
 
 export const lastLine = (text: string | undefined): string | undefined => text?.trim().split("\n").pop()?.trim() || undefined;
 
