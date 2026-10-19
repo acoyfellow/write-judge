@@ -10,7 +10,7 @@
    "at": "2026-10-17T22:25:33.119Z",
    "event": "judged",
    "tool": "edit",
-   "path": "/Users/jcoeyman/cloudflare/write-judge/.real/sandbox/math.test.ts",
+   "path": "./.real/sandbox/math.test.ts",
    "verdict": "block",
    "weakens": 0.9914,
    "ms": 256

@@ -20,9 +20,11 @@ Predicting which writes an agent will undo later. Across 300 real writes, no yes
 ## Use
 
 ```sh
-export WRITE_JUDGE_ACCOUNT_ID=<account> WRITE_JUDGE_TOKEN=<workers ai token> WRITE_JUDGE_MODEL=<yes/no model id>
+export WRITE_JUDGE_ACCOUNT_ID=<account> WRITE_JUDGE_TOKEN=<workers ai token> WRITE_JUDGE_MODEL=@cf/cloudflare/clef
 pi --extension ./src/index.ts
 ```
+
+If the model cannot be reached (expired token, offline), the extension lets the write through, logs `unavailable`, and shows one warning per session. Pass a token source as the second argument to `writeJudge` to refresh once on failure.
 
 Optional: `WRITE_JUDGE_LOG=/path/to/judge.jsonl` records every verdict. Without config the extension loads and does nothing.
 
