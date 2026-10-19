@@ -1,7 +1,7 @@
 import { Type } from "typebox";
 import { Value } from "typebox/value";
 
-export type Fetch = (url: string, init: { method: string; headers: Record<string, string>; body: string }) => Promise<Pick<Response, "json">>;
+export type Fetch = (url: string, init: { method: string; headers: Record<string, string>; body: string }) => Promise<Pick<Response, "json" | "status">>;
 
 export type ClefConfig = { readonly accountId: string; readonly token: string; readonly model: string };
 
@@ -11,7 +11,7 @@ export type Probabilities = Readonly<Record<string, number>>;
 
 const Reply = Type.Object({
   success: Type.Boolean(),
-  result: Type.Optional(Type.Object({ answers: Type.Record(Type.String(), Type.Object({ noul: Type.Optional(Type.Number()) })) })),
+  result: Type.Optional(Type.Union([Type.Null(), Type.Object({ answers: Type.Record(Type.String(), Type.Object({ noul: Type.Optional(Type.Number()) })) })])),
   errors: Type.Optional(Type.Array(Type.Object({ code: Type.Optional(Type.Number()), message: Type.Optional(Type.String()) }))),
 });
 
@@ -33,7 +33,7 @@ export const askClef = async (fetcher: Fetch, config: ClefConfig, state: string,
 
     if (reply.success && reply.result) return Object.fromEntries(Object.entries(reply.result.answers).map(([id, answer]) => [id, answer.noul ?? 0]));
 
-    if (attempt >= RETRIES) throw new Error(`clef call failed: ${JSON.stringify(reply.errors)}`);
+    if (response.status === 401 || response.status === 403 || attempt >= RETRIES) throw new Error(`clef call failed (${response.status}): ${JSON.stringify(reply.errors)}`);
     await pause(250 * 2 ** attempt);
   }
 };

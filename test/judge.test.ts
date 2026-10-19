@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { askClef } from "../src/clef.ts";
-import { configOf } from "../src/index.ts";
+import { configOf, judgeWithRefresh } from "../src/index.ts";
 import { WEAKENS_AT, callOf, stateOf, verdictOf } from "../src/judge.ts";
 
 describe("callOf", () => {
@@ -45,10 +45,52 @@ describe("askClef", () => {
     let calls = 0;
 
     const fetcher = async () => ({
+      status: calls < 1 ? 429 : 200,
       json: async () => (++calls < 2 ? { success: false, errors: [{ code: 3040 }] } : { success: true, result: { answers: { weakens: { noul: 0.8 } } } }),
     });
 
     expect(await askClef(fetcher, { accountId: "a", token: "t", model: "m" }, "s", {})).toEqual({ weakens: 0.8 });
     expect(calls).toBe(2);
+  });
+});
+
+describe("judgeWithRefresh", () => {
+  it("uses the current token when it works", async () => {
+    const result = await judgeWithRefresh(async () => 0.9, "old", () => "new");
+    expect(result).toEqual({ judgement: { kind: "judged", weakens: 0.9 }, token: "old" });
+  });
+
+  it("refreshes once after a failure and keeps the new token", async () => {
+
+    const failsOnOld = async (token: string) => {
+      if (token === "old") throw new Error("401");
+
+      return 0.2;
+    };
+
+    const result = await judgeWithRefresh(failsOnOld, "old", () => "new");
+    expect(result).toEqual({ judgement: { kind: "judged", weakens: 0.2 }, token: "new" });
+  });
+
+  it("reports unavailable instead of throwing when refresh does not help", async () => {
+    const same = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", () => "old");
+    const none = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", () => undefined);
+    const stillBad = await judgeWithRefresh(async () => { throw new Error("401"); }, "old", () => "new");
+    expect([same.judgement.kind, none.judgement.kind, stillBad.judgement.kind]).toEqual(["unavailable", "unavailable", "unavailable"]);
+  });
+});
+
+describe("askClef on auth errors", () => {
+  it("fails at once on 401 instead of retrying", async () => {
+    let calls = 0;
+
+    const fetcher = async () => {
+      calls++;
+
+      return { status: 401, json: async () => ({ success: false, errors: [{ code: 10000, message: "Authentication error" }] }) };
+    };
+
+    await expect(askClef(fetcher, { accountId: "a", token: "t", model: "m" }, "s", { q: { type: "noul", instructions: "q" } })).rejects.toThrow("401");
+    expect(calls).toBe(1);
   });
 });
