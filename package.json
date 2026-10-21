@@ -1,12 +1,24 @@
 {
   "name": "write-judge",
-    "type": "module",
+  "type": "module",
   "description": "Pi extension: a small yes/no model blocks edits that weaken tests, before they land.",
   "version": "0.2.0",
   "license": "MIT",
-  "keywords": ["pi-package", "pi-extension", "ai-agents", "testing", "cloudflare", "workers-ai"],
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "ai-agents",
+    "testing",
+    "cloudflare",
+    "workers-ai"
+  ],
   "repository": "github:acoyfellow/write-judge",
-  "files": ["src", "defaults.json", "README.md", "LICENSE"],
+  "files": [
+    "src",
+    "defaults.json",
+    "README.md",
+    "LICENSE"
+  ],
   "pi": {
     "extensions": [
       "./src/index.ts"
@@ -22,12 +34,13 @@
     "@types/node": "^22.0.0",
     "oxlint": "1.88.0",
     "typescript": "^5.9.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "typebox": "1.3.27"
   },
   "allowScripts": {
     "esbuild@0.28.2": true
   },
-  "dependencies": {
-    "typebox": "1.3.27"
+  "peerDependencies": {
+    "typebox": "*"
   }
 }
