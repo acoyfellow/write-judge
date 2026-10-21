@@ -6,6 +6,7 @@ import { type ClefConfig, askClef } from "./clef.ts";
 import { QUESTIONS, type ToolInput, callOf, stateOf, verdictOf } from "./judge.ts";
 import { Type } from "typebox";
 import { Value } from "typebox/value";
+import { cachedTestScan, type TestScan } from "./tests.ts";
 import { wranglerAccountId, wranglerToken } from "./wrangler.ts";
 
 type Env = Readonly<Record<string, string | undefined>>;
@@ -88,7 +89,7 @@ export const resolveConfig = async (env: Env, token: TokenSource, accountId: () 
 
 const SETUP_HINT = "write-judge is installed but not active: run `npx wrangler login` (free Cloudflare account), then /reload.";
 
-export const writeJudge = (pi: ExtensionAPI, loadConfig: ConfigSource, refreshToken: TokenSource) => {
+export const writeJudge = (pi: ExtensionAPI, loadConfig: ConfigSource, refreshToken: TokenSource, hasTests: TestScan = cachedTestScan()) => {
   const log = process.env["WRITE_JUDGE_LOG"];
   let pending: Promise<ClefConfig | null> | undefined;
   let token: string | undefined;
@@ -105,6 +106,12 @@ export const writeJudge = (pi: ExtensionAPI, loadConfig: ConfigSource, refreshTo
     const call = callOf(toolInputOf(event), said);
 
     if (!call) return undefined;
+
+    if (!hasTests(call.path, ctx.cwd)) {
+      logLine(log, { event: "skipped", reason: "no-tests", tool: call.tool, path: call.path });
+
+      return undefined;
+    }
     pending ??= loadConfig().then((config) => {
       logLine(log, { event: "loaded", configured: config !== null });
 

@@ -81,6 +81,7 @@ A guard that breaks your agent is worse than no guard.
 
 | Situation | What happens |
 |---|---|
+| Project has no tests | Edit goes through with no model or network call, logged as `skipped` |
 | Token valid | Normal judgement |
 | Token expired | Gets a fresh one from wrangler and retries once |
 | Logged out or offline | Edit goes through, one warning per session, logged as `unavailable` |
